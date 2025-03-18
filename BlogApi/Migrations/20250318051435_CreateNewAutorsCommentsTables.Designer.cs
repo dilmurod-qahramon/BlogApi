@@ -4,6 +4,7 @@ using BlogApi.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogApi.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    partial class BlogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250318051435_CreateNewAutorsCommentsTables")]
+    partial class CreateNewAutorsCommentsTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,6 +94,9 @@ namespace BlogApi.Migrations
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AuthorId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(10000)
@@ -114,13 +120,15 @@ namespace BlogApi.Migrations
 
                     b.HasIndex("AuthorId");
 
+                    b.HasIndex("AuthorId1");
+
                     b.ToTable("posts");
                 });
 
             modelBuilder.Entity("BlogApi.Models.Comment", b =>
                 {
                     b.HasOne("BlogApi.Models.Author", "Author")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -138,18 +146,20 @@ namespace BlogApi.Migrations
             modelBuilder.Entity("BlogApi.Models.Post", b =>
                 {
                     b.HasOne("BlogApi.Models.Author", "Author")
-                        .WithMany("Posts")
+                        .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("BlogApi.Models.Author", null)
+                        .WithMany("Posts")
+                        .HasForeignKey("AuthorId1");
 
                     b.Navigation("Author");
                 });
 
             modelBuilder.Entity("BlogApi.Models.Author", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("Posts");
                 });
 
